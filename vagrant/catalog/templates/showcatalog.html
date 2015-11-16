@@ -14,11 +14,9 @@
                     <a href = "{{url_for('showItem',
                                 category_name = item.category.name,
                                 item_name = item.name)}}">
-                        {{ item.name }}</a>
-                    <p>({{ item.category.name }})</p>
+                        {{ item.name }}</a> 
+                    ({{ item.category.name }})
                     <p>{{ item.date }}</p>
-                    <p>{{ item.description }}</p>
-                    <img src="{{ item.picture }}">
                 </div>
             </div>
         {% endfor %}

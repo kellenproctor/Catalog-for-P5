@@ -8,6 +8,7 @@
         <div class="item">
             <p>{{ item.description }}</p>
         </div>
+        <img src="{{ item.picture }}">
         <div class="addanddelete">
             <a href = "{{url_for('editItem',
                     category_name = item.category.name,

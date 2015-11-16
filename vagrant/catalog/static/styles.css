@@ -1,0 +1,22 @@
+* {
+    outline: 1px solid red;
+}
+
+html, body {
+    background-color: #CCC;
+    height: 100%;
+}
+
+.fill {
+    background-color: white;
+    height: 100%;
+}
+
+.top-menu {
+    background-color: green;
+}
+
+.categories {
+    border-right: 1px solid gray;
+}
+
