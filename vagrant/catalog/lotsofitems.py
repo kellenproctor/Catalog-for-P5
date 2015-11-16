@@ -38,8 +38,20 @@ Item1 = Items(user_id=1,
               name="Double Double AS",
               date=time1,
               description="Juicy grilled double beef patty, specially prepared",
-              picture="http://loremflickr.com/400/400/",
+              picture="http://loremflickr.com/200/200/burger?random=1",
               category=category1)
 
 session.add(Item1)
+session.commit()
+
+time2 = datetime.datetime.now()
+Item2 = Items(user_id=1,
+              category_id=1,
+              name="Star McWhopper",
+              date=time2,
+              description="Charbroiled and very tasty. Known to be messy",
+              picture="http://loremflickr.com/200/200/burger?random=2",
+              category=category1)
+
+session.add(Item2)
 session.commit()
