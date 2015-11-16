@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, jsonify
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Items
@@ -73,6 +73,31 @@ def deleteItem(category_name, item_name):
     return render_template('deleteitem.html',
                             item=item)
 
+
+
+# JSON APIs to view category and Item information
+@app.route('/catalog/JSON')
+def allItemsJSON():
+    items = session.query(Items).all()
+    return jsonify(items=[i.serialize for i in items])
+
+@app.route('/catalog/categories/JSON')
+def categoriesJSON():
+    categories = session.query(Category).all()
+    return jsonify(categories=[c.serialize for c in categories])
+
+@app.route('/catalog/<category_name>/JSON')
+def categoryItemsJSON(category_name):
+    category = session.query(Category).filter_by(name=category_name).one()
+    items = session.query(Items).filter_by(category=category).all()
+    return jsonify(items=[i.serialize for i in items])
+
+@app.route('/catalog/<category_name>/<item_name>/JSON')
+def categoryItemJSON(category_name, item_name):
+    category = session.query(Category).filter_by(name=category_name).one()
+    item = session.query(Items).filter_by(name=item_name,\
+                                        category=category).one()
+    return jsonify(item=[item.serialize])
 
 
 if __name__ == "__main__":

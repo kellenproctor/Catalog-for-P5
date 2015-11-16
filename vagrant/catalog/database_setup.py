@@ -52,7 +52,7 @@ class Items(Base):
             'id'            : self.id,
             'description'   : self.description,
             'picture'       : self.picture,
-            'category'      : self.category
+            'category'      : self.category.name
         }
 
 
