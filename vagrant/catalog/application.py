@@ -13,8 +13,6 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-
-
 # Basic Routing here:
 # Show categories and most recent items
 @app.route('/')
@@ -31,22 +29,37 @@ def showCatalog():
 @app.route('/catalog/<category_name>/')
 @app.route('/catalog/<category_name>/items/')
 def showCategoryItems(category_name):
-    return 'Show the Category Items here!!'
+    catalog = session.query(Category).order_by(asc(Category.name))
+    category = session.query(Category).filter_by(name=category_name).one()
+    items = session.query(Items).filter_by(category=category)\
+                                .order_by(asc(Items.name))
+    count = session.query(Items).filter_by(category=category).count()
+    return render_template('showitems.html',
+                            category=category.name,
+                            categories=catalog,
+                            items=items,
+                            count=count)
 
 # Show the specifics of an item
 @app.route('/catalog/<category_name>/<item_name>/')
 def showItem(category_name, item_name):
-    return 'Show the selected Item here!!'
+    item = session.query(Items).filter_by(name=item_name).one()
+    return render_template('itemdescription.html',
+                            item=item)
 
 # Edit an item
 @app.route('/catalog/<category_name>/<item_name>/edit')
 def editItem(category_name, item_name):
-    return 'Edit the selected Item here!!'
+    item = session.query(Items).filter_by(name=item_name).one()
+    return render_template('edititem.html',
+                            item=item)
 
 # Delete an item
 @app.route('/catalog/<category_name>/<item_name>/delete')
 def deleteItem(category_name, item_name):
-    return 'Delete the selected Item here!!'
+    item = session.query(Items).filter_by(name=item_name).one()
+    return render_template('deleteitem.html',
+                            item=item)
 
 
 
