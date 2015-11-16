@@ -40,6 +40,18 @@ def showCategoryItems(category_name):
                             items=items,
                             count=count)
 
+# Add an item
+@app.route('/catalog/add')
+def addItem():
+    return render_template('additem.html')
+
+# Add an item to a Category
+@app.route('/catalog/<category_name>/add')
+def addCategoryItem(category_name):
+    category = session.query(Category).filter_by(name=category_name).one()
+    return render_template('addcategoryitem.html',
+                            category=category)
+
 # Show the specifics of an item
 @app.route('/catalog/<category_name>/<item_name>/')
 def showItem(category_name, item_name):

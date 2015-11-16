@@ -8,6 +8,14 @@
         <div class="item">
             <p>{{ item.description }}</p>
         </div>
+        <div class="addanddelete">
+            <a href = "{{url_for('editItem',
+                    category_name = item.category.name,
+                    item_name = item.name)}}">Edit</a> | 
+            <a href = "{{url_for('deleteItem',
+                    category_name = item.category.name,
+                    item_name = item.name)}}">Delete</a>
+        </div>
     </div>
 </div>
 {% endblock %}
