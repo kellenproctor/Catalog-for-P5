@@ -55,3 +55,37 @@ Item2 = Items(user_id=1,
 
 session.add(Item2)
 session.commit()
+
+category2 = Category(name="Fries")
+
+session.add(category2)
+session.commit()
+
+time3 = datetime.datetime.now()
+Item3 = Items(user_id=1,
+              category_id=2,
+              name="Chips",
+              date=time3,
+              description="A british interpretation of a classic diner item",
+              picture="http://loremflickr.com/200/200/fries?random=1",
+              category=category2)
+
+session.add(Item3)
+session.commit()
+
+time4 = datetime.datetime.now()
+Item4 = Items(user_id=1,
+              category_id=2,
+              name="Waffle",
+              date=time4,
+              description="Almost better than curly fries",
+              picture="http://loremflickr.com/200/200/fries?random=2",
+              category=category2)
+
+session.add(Item4)
+session.commit()
+
+category3 = Category(name="Milk Shakes")
+
+session.add(category3)
+session.commit()

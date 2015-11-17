@@ -63,8 +63,9 @@ def showItem(category_name, item_name):
 @app.route('/catalog/<category_name>/<item_name>/edit')
 def editItem(category_name, item_name):
     item = session.query(Items).filter_by(name=item_name).one()
+    categories = session.query(Category).all()
     return render_template('edititem.html',
-                            item=item)
+                            item=item, categories=categories)
 
 # Delete an item
 @app.route('/catalog/<category_name>/<item_name>/delete')
@@ -76,10 +77,18 @@ def deleteItem(category_name, item_name):
 
 
 # JSON APIs to view category and Item information
-@app.route('/catalog/JSON')
+@app.route('/catalog.JSON')
 def allItemsJSON():
-    items = session.query(Items).all()
-    return jsonify(items=[i.serialize for i in items])
+    categories = session.query(Category).all()
+    category_dict = [c.serialize for c in categories]
+    # Best way I found to replicate the JSON call picture in the assignment
+    # notes. Does this look ok?
+    for c in range(len(category_dict)):
+        items = [i.serialize for i in session.query(Items)\
+                    .filter_by(category_id=category_dict[c]["id"]).all()]
+        if items:
+            category_dict[c]["Item"] = items
+    return jsonify(Category=category_dict)
 
 @app.route('/catalog/categories/JSON')
 def categoriesJSON():
@@ -93,11 +102,12 @@ def categoryItemsJSON(category_name):
     return jsonify(items=[i.serialize for i in items])
 
 @app.route('/catalog/<category_name>/<item_name>/JSON')
-def categoryItemJSON(category_name, item_name):
+def ItemJSON(category_name, item_name):
     category = session.query(Category).filter_by(name=category_name).one()
     item = session.query(Items).filter_by(name=item_name,\
                                         category=category).one()
     return jsonify(item=[item.serialize])
+
 
 
 if __name__ == "__main__":
