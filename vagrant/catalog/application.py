@@ -1,4 +1,5 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify
+from flask import Flask, render_template, url_for, request, redirect
+from flask import jsonify, flash
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Items
@@ -20,7 +21,7 @@ session = DBSession()
 @app.route('/catalog/')
 def showCatalog():
     catalog = session.query(Category).order_by(asc(Category.name))
-    items = session.query(Items).order_by(desc(Items.date))
+    items = session.query(Items).order_by(desc(Items.date)).limit(5)
     return render_template('showcatalog.html',
                             categories=catalog,
                             items=items)
@@ -42,16 +43,42 @@ def showCategoryItems(category_name):
                             count=count)
 
 # Add an item
-@app.route('/catalog/add')
+@app.route('/catalog/add', methods=['GET', 'POST'])
 def addItem():
-    return render_template('additem.html')
+    categories = session.query(Category).all()
+    if request.method == 'POST':
+        newItem = Items(
+            name=request.form['name'],
+            description=request.form['description'],
+            picture=request.form['picture'],
+            category=session.query(Category).filter_by(name=request.form['category']).one(),
+            date=datetime.datetime.now())
+        session.add(newItem)
+        session.commit()
+        #flash('Item Successfully Added!')
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('additem.html', categories=categories)
 
 # Add an item to a Category
-@app.route('/catalog/<category_name>/add')
+@app.route('/catalog/<category_name>/add', methods=['GET', 'POST'])
 def addCategoryItem(category_name):
     category = session.query(Category).filter_by(name=category_name).one()
-    return render_template('addcategoryitem.html',
-                            category=category)
+    categories = session.query(Category).all()
+    if request.method == 'POST':
+        newItem = Items(
+            name=request.form['name'],
+            description=request.form['description'],
+            picture=request.form['picture'],
+            category=session.query(Category).filter_by(name=request.form['category']).one(),
+            date=datetime.datetime.now())
+        session.add(newItem)
+        session.commit()
+        #flash('Category Item Successfully Added!')
+        return redirect(url_for('showCategoryItems', category_name=category.name))
+    else:
+        return render_template('addcategoryitem.html',
+                            category=category, categories=categories)
 
 # Show the specifics of an item
 @app.route('/catalog/<category_name>/<item_name>/')
@@ -87,13 +114,24 @@ def editItem(category_name, item_name):
                                 item=editedItem, categories=categories)
 
 # Delete an item
-@app.route('/catalog/<category_name>/<item_name>/delete')
+@app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
 def deleteItem(category_name, item_name):
-    item = session.query(Items).filter_by(name=item_name).one()
-    return render_template('deleteitem.html',
-                            item=item)
+    itemToDelete = session.query(Items).filter_by(name=item_name).one()
+    category = session.query(Category).filter_by(name=category_name).one()
+    if request.method =='POST':
+        session.delete(itemToDelete)
+        session.commit()
+        #flash('Item Successfully Deleted! We will miss that'+itemToDelete.name)
+        return redirect(url_for('showCategoryItems', category_name=category.name))
+    else:
+        return render_template('deleteitem.html', item=itemToDelete)
 
 
+  #####  ###   ###  #   #
+    #   #     #   # ##  #
+    #   ####  #   # # # #
+    #       # #   # #  ##
+  ##     ###   ###  #   #
 
 # JSON APIs to view category and Item information
 @app.route('/catalog.JSON')
