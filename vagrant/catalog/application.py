@@ -55,7 +55,7 @@ def addItem():
             date=datetime.datetime.now())
         session.add(newItem)
         session.commit()
-        #flash('Item Successfully Added!')
+        flash('Item Successfully Added!')
         return redirect(url_for('showCatalog'))
     else:
         return render_template('additem.html', categories=categories)
@@ -74,7 +74,7 @@ def addCategoryItem(category_name):
             date=datetime.datetime.now())
         session.add(newItem)
         session.commit()
-        #flash('Category Item Successfully Added!')
+        flash('Category Item Successfully Added!')
         return redirect(url_for('showCategoryItems', category_name=category.name))
     else:
         return render_template('addcategoryitem.html',
@@ -106,7 +106,7 @@ def editItem(category_name, item_name):
         editedItem.date = time
         session.add(editedItem)
         session.commit()
-        #flash('Category Item Successfully Edited!')
+        flash('Category Item Successfully Edited!')
         return  redirect(url_for('showCategoryItems',
                                         category_name=editedItem.category.name))
     else:
@@ -121,7 +121,7 @@ def deleteItem(category_name, item_name):
     if request.method =='POST':
         session.delete(itemToDelete)
         session.commit()
-        #flash('Item Successfully Deleted! We will miss that'+itemToDelete.name)
+        flash('Item Successfully Deleted! We will miss that '+itemToDelete.name)
         return redirect(url_for('showCategoryItems', category_name=category.name))
     else:
         return render_template('deleteitem.html', item=itemToDelete)
