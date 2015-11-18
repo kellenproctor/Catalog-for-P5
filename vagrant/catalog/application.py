@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Items
+import datetime
 
 app = Flask(__name__)
 
@@ -60,12 +61,30 @@ def showItem(category_name, item_name):
                             item=item)
 
 # Edit an item
-@app.route('/catalog/<category_name>/<item_name>/edit')
+@app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
 def editItem(category_name, item_name):
-    item = session.query(Items).filter_by(name=item_name).one()
+    editedItem = session.query(Items).filter_by(name=item_name).one()
     categories = session.query(Category).all()
-    return render_template('edititem.html',
-                            item=item, categories=categories)
+    if request.method == 'POST':
+        if request.form['name']:
+            editedItem.name = request.form['name']
+        if request.form['description']:
+            editedItem.description = request.form['description']
+        if request.form['picture']:
+            editedItem.picture = request.form['picture']
+        if request.form['category']:
+            category = session.query(Category).filter_by(name=request.form['category']).one()
+            editedItem.category = category
+        time = datetime.datetime.now()
+        editedItem.date = time
+        session.add(editedItem)
+        session.commit()
+        #flash('Category Item Successfully Edited!')
+        return  redirect(url_for('showCategoryItems',
+                                        category_name=editedItem.category.name))
+    else:
+        return render_template('edititem.html',
+                                item=editedItem, categories=categories)
 
 # Delete an item
 @app.route('/catalog/<category_name>/<item_name>/delete')
