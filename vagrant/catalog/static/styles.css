@@ -39,6 +39,14 @@ html, body {
     padding-top: 5px;
 }
 
+.glyphicon {
+    padding-left: 5%;
+}
+
+.login {
+    padding-top: 25px;
+}
+
 /*.divider {
     height: 5px;
 }
