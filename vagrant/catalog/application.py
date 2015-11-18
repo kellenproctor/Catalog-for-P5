@@ -2,6 +2,9 @@ from flask import Flask, render_template, url_for, request, redirect
 from flask import jsonify, flash
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
+from flask import session as login_session
+import random
+import string
 from database_setup import Base, User, Category, Items
 import datetime
 
@@ -14,6 +17,32 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+ #      ###   ###  ##### #   #
+ #     #   # #       #   ##  #
+ #     #   # #  ##   #   # # #
+ #     #   # #   #   #   #  ##
+ #####  ###   ###  ##### #   #
+
+# Login and OAuth routes and functions here
+
+# Create anti-forgery state token
+@app.route('/login')
+def showLogin():
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+    login_session['state'] = state    
+    return render_template('login.html', STATE=state)
+
+
+
+
+
+
+ ####   ###  #   # ##### #####  ### 
+ #   # #   # #   #   #   #     #    
+ ###   #   # #   #   #   ###    ### 
+ #  #  #   # #   #   #   #         #
+ #   #  ###   ###    #   #####  ### 
 
 # Basic Routing here:
 # Show categories and most recent items
@@ -84,8 +113,11 @@ def addCategoryItem(category_name):
 @app.route('/catalog/<category_name>/<item_name>/')
 def showItem(category_name, item_name):
     item = session.query(Items).filter_by(name=item_name).one()
+    categories = session.query(Category).all()
     return render_template('itemdescription.html',
-                            item=item)
+                            item=item,
+                            category=category_name,
+                            categories=categories)
 
 # Edit an item
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
@@ -129,7 +161,7 @@ def deleteItem(category_name, item_name):
 
   #####  ###   ###  #   #
     #   #     #   # ##  #
-    #   ####  #   # # # #
+    #    ###  #   # # # #
     #       # #   # #  ##
   ##     ###   ###  #   #
 

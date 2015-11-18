@@ -3,8 +3,18 @@
 }*/
 
 html, body {
-    background-color: #CCC;
+    background-color: #EEEEF5;
     height: 100%;
+}
+
+.row {
+    background-color: white;
+}
+
+.page-header {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    padding-top: 9px;
 }
 
 .fill {
@@ -13,10 +23,31 @@ html, body {
 }
 
 .top-menu {
-    background-color: green;
+    background: #dff0d8; /* Old browsers */
+    background: -moz-linear-gradient(top,  #dff0d8 0%, #c2f0c2 95%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #dff0d8 0%,#c2f0c2 95%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #dff0d8 0%,#c2f0c2 95%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dff0d8', endColorstr='#c2f0c2',GradientType=0 ); /* IE6-9 */
+
 }
 
-.categories {
-    border-right: 1px solid gray;
+.item {
+    margin-bottom: 10px;
 }
+
+.small {
+    padding-top: 5px;
+}
+
+/*.divider {
+    height: 5px;
+}
+
+.divider.green {
+    background-color: #c2f0c2;
+}*/
+
+/*.categories {
+    border-right: 1px solid gray;
+}*/
 

@@ -1,10 +1,10 @@
-<div class="col-md-3 categories">
+<div class="col-md-3">
     <h1>Categories</h1>
-    {% for category in categories %}
-        <div class="category">
-            <a href="{{url_for('showCategoryItems', category_name = category.name,)}}">
-                {{ category.name }}
+    <div class="list-group">
+        {% for c in categories %}
+            <a href="{{url_for('showCategoryItems', category_name = c.name,)}}" class="list-group-item {% if category %}{% if c.name == category %}active{% endif %}{% endif %}">
+                {{ c.name }}
             </a>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
