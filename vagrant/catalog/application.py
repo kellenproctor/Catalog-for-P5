@@ -3,8 +3,7 @@ from flask import jsonify, flash
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from flask import session as login_session
-import random
-import string
+import random, string
 from database_setup import Base, User, Category, Items
 import datetime
 
@@ -30,8 +29,9 @@ session = DBSession()
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
-    login_session['state'] = state    
-    return render_template('login.html', STATE=state)
+    login_session['state'] = state   
+    return "The current session stat is %s" %login_session['state']
+    #return render_template('login.html', STATE=state)
 
 
 
