@@ -1,11 +1,14 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask import jsonify, flash
 from sqlalchemy import create_engine, asc, desc
+from database_setup import Base, User, Category, Items
 from sqlalchemy.orm import sessionmaker
 from flask import session as login_session
-import random, string
-from database_setup import Base, User, Category, Items
-import datetime
+import random, string, datetime
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2, json, requests
+from flask import make_response
 
 app = Flask(__name__)
 
@@ -30,10 +33,9 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state   
-    return "The current session stat is %s" %login_session['state']
-    #return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state)
 
-
+@app.route('/gconnect')
 
 
 
