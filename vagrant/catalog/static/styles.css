@@ -54,6 +54,10 @@ html, body {
     border: 2px solid #FFF;
 }
 
+.fb-login-button {
+    margin-bottom: 10px;
+}
+
 #signinButton {
     margin-top: 25px;
 }
