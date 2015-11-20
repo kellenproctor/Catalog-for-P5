@@ -10,6 +10,8 @@
         <div class="login_logout">
                 {% if user %}
                     <a href="{{url_for('gdisconnect')}}" class="btn btn-default">Logout</a>
+                {% elif login %}
+                    <div class=""></div>
                 {% else %}
                     <a href="{{url_for('showLogin')}}" class="btn btn-default">Login</a>
                 {% endif %}

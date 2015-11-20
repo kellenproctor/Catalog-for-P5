@@ -47,6 +47,10 @@ html, body {
     margin-top: 20px;
 }
 
+#signinButton {
+    margin-top: 25px;
+}
+
 /*.divider {
     height: 5px;
 }

@@ -60,7 +60,7 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state   
-    return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state, login=True)
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -148,7 +148,7 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += '" class="img-circle" style = "width: 300px; height: 300px;">'
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
