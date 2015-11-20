@@ -208,6 +208,13 @@ def showCatalog():
     catalog = session.query(Category).order_by(asc(Category.name))
     items = session.query(Items).order_by(desc(Items.date)).limit(5)
     print login_session
+    #del login_session['credentials']
+    #del login_session['gplus_id']
+    #del login_session['username']
+    #del login_session['email']
+    #del login_session['picture']
+    #del login_session['user_id']
+    #del login_session['state']
     if 'username' not in login_session:
         return render_template('publicshowcatalog.html',
                                 categories=catalog,
