@@ -11,9 +11,9 @@ app! Let's hope it works! Written using Flask and based off of the excellent
 workflow taught by Lorenzo, we're looking to exceed expectations.
 
 ####FILES:
-xxxxxx.sql - contains database schema
-xxxxxx.py - contains python code for interacting with database
-xxxxxx.py - contains tests for python code
+database_setup.py - contains database schema
+lotsofitems.py - contains python code for adding database items
+application.py - contains the flask app
 
 ####DOWNLOAD:
 Please clone to your most convenient directory (folder) via the following
@@ -36,18 +36,18 @@ directory, and run the following commands:
 ```
 vagrant up
 vagrant ssh
-cd /vagrant/item_catalog
+cd /vagrant/catalog
 ```
 
 This will get you into the item_catalog directory, where you can interact with
 the files as listed above. To initiate the item catalog web-app,
-run the following command inside the directory containing **project.py**:
+run the following command inside the directory containing **application.py**:
 
 ```
-python project.py
+python application.py
 ```
 
-Open **http://localhost:5000/** in your browser, and commence interacting with
+Open **http://localhost:8000/** in your browser, and commence interacting with
 the platform!
 
 
