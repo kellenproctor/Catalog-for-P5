@@ -44,6 +44,8 @@ the files as listed above. To initiate the item catalog web-app,
 run the following command inside the directory containing **application.py**:
 
 ```
+python database_setup.py
+python lotsofitems.py
 python application.py
 ```
 
