@@ -22,6 +22,30 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
+def createUser(login_session):
+    print login_session
+    newUser = User(
+                name=   login_session['username'],
+                email=  login_session['email'],
+                picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email = login_session['email']).one()
+    return user.id
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id = user_id).one()
+    return user
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email = email).one()
+        return user.id
+    except:
+        return None
+
+
  #      ###   ###  ##### #   #
  #     #   # #       #   ##  #
  #     #   # #  ##   #   # # #
@@ -111,6 +135,13 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    # See if user exists, if they don't, add her!
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
+    # Welcome message
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -121,6 +152,7 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
+
 
 # DISCONNECT - Revoke a current user's token and reset their login_session.
 @app.route('/gdisconnect')
@@ -146,11 +178,13 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
+        del login_session['user_id']
+        del login_session['state']
 
         response = make_response(
             json.dumps("Successfully disconnected."), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect('/catalog')
 
     else:
         # For whatever reason, the given token was invalid.
@@ -173,9 +207,17 @@ def gdisconnect():
 def showCatalog():
     catalog = session.query(Category).order_by(asc(Category.name))
     items = session.query(Items).order_by(desc(Items.date)).limit(5)
-    return render_template('showcatalog.html',
-                            categories=catalog,
-                            items=items)
+    print login_session
+    if 'username' not in login_session:
+        return render_template('publicshowcatalog.html',
+                                categories=catalog,
+                                items=items)
+    else:
+        user = getUserInfo(login_session['user_id'])
+        return render_template('showcatalog.html',
+                                categories=catalog,
+                                items=items,
+                                user=user)
 
 
 # Show specific category items
@@ -187,11 +229,20 @@ def showCategoryItems(category_name):
     items = session.query(Items).filter_by(category=category)\
                                 .order_by(asc(Items.name))
     count = session.query(Items).filter_by(category=category).count()
-    return render_template('showitems.html',
-                            category=category.name,
-                            categories=catalog,
-                            items=items,
-                            count=count)
+    if 'username' not in login_session:
+        return render_template('publicshowitems.html',
+                                category=category.name,
+                                categories=catalog,
+                                items=items,
+                                count=count)
+    else:
+        user = getUserInfo(login_session['user_id'])
+        return render_template('showitems.html',
+                                category=category.name,
+                                categories=catalog,
+                                items=items,
+                                count=count,
+                                user=user)
 
 # Add an item
 @app.route('/catalog/add', methods=['GET', 'POST'])
@@ -205,13 +256,17 @@ def addItem():
             description=request.form['description'],
             picture=request.form['picture'],
             category=session.query(Category).filter_by(name=request.form['category']).one(),
-            date=datetime.datetime.now())
+            date=datetime.datetime.now(),
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash('Item Successfully Added!')
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('additem.html', categories=categories)
+        user = getUserInfo(login_session['user_id'])
+        return render_template('additem.html',
+                                categories=categories,
+                                user=user)
 
 # Add an item to a Category
 @app.route('/catalog/<category_name>/add', methods=['GET', 'POST'])
@@ -220,30 +275,45 @@ def addCategoryItem(category_name):
         return redirect('/login')
     category = session.query(Category).filter_by(name=category_name).one()
     categories = session.query(Category).all()
+    user = getUserInfo(login_session['user_id'])
     if request.method == 'POST':
         newItem = Items(
             name=request.form['name'],
             description=request.form['description'],
             picture=request.form['picture'],
             category=session.query(Category).filter_by(name=request.form['category']).one(),
-            date=datetime.datetime.now())
+            date=datetime.datetime.now(),
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash('Category Item Successfully Added!')
         return redirect(url_for('showCategoryItems', category_name=category.name))
     else:
         return render_template('addcategoryitem.html',
-                            category=category, categories=categories)
+                                category=category,
+                                categories=categories,
+                                user=user)
 
 # Show the specifics of an item
 @app.route('/catalog/<category_name>/<item_name>/')
 def showItem(category_name, item_name):
     item = session.query(Items).filter_by(name=item_name).one()
     categories = session.query(Category).all()
-    return render_template('itemdescription.html',
-                            item=item,
-                            category=category_name,
-                            categories=categories)
+    creator = getUserInfo(item.user_id)
+    user = getUserInfo(login_session['user_id'])
+    if 'username' not in login_session or creator.id != login_session['user_id']:
+        return render_template('publicitemdescription.html',
+                                item=item,
+                                category=category_name,
+                                categories=categories,
+                                user=user)
+    else:
+        return render_template('itemdescription.html',
+                                item=item,
+                                category=category_name,
+                                categories=categories,
+                                creator=creator,
+                                user=user)
 
 # Edit an item
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
@@ -252,6 +322,16 @@ def editItem(category_name, item_name):
         return redirect('/login')
     editedItem = session.query(Items).filter_by(name=item_name).one()
     categories = session.query(Category).all()
+    # Check if this user is the owner of the item before proceeding
+    creator = getUserInfo(editedItem.user_id)
+    user = getUserInfo(login_session['user_id'])
+    if creator.id != login_session['user_id']:
+        return render_template('publicitemdescription.html',
+                                item=editedItem,
+                                category=category_name,
+                                categories=categories,
+                                user=user)
+    # POST methods
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
@@ -268,10 +348,13 @@ def editItem(category_name, item_name):
         session.commit()
         flash('Category Item Successfully Edited!')
         return  redirect(url_for('showCategoryItems',
-                                        category_name=editedItem.category.name))
+                                category_name=editedItem.category.name,
+                                user=user))
     else:
         return render_template('edititem.html',
-                                item=editedItem, categories=categories)
+                                item=editedItem,
+                                categories=categories,
+                                user=user)
 
 # Delete an item
 @app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
@@ -280,13 +363,27 @@ def deleteItem(category_name, item_name):
         return redirect('/login')
     itemToDelete = session.query(Items).filter_by(name=item_name).one()
     category = session.query(Category).filter_by(name=category_name).one()
+    categories = session.query(Category).all()
+    # Check if this user is the owner of the item before proceeding
+    creator = getUserInfo(itemToDelete.user_id)
+    user = getUserInfo(login_session['user_id'])
+    if creator.id != login_session['user_id']:
+        return render_template('publicitemdescription.html',
+                                item=itemToDelete,
+                                category=category_name,
+                                categories=categories,
+                                user=user)
     if request.method =='POST':
         session.delete(itemToDelete)
         session.commit()
         flash('Item Successfully Deleted! We will miss that '+itemToDelete.name)
-        return redirect(url_for('showCategoryItems', category_name=category.name))
+        return redirect(url_for('showCategoryItems',
+                                category_name=category.name,
+                                user=user))
     else:
-        return render_template('deleteitem.html', item=itemToDelete)
+        return render_template('deleteitem.html',
+                                item=itemToDelete,
+                                user=user)
 
 
   #####  ###   ###  #   #

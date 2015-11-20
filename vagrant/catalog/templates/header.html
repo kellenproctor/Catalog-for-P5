@@ -7,6 +7,12 @@
         </h2>
     </div>
     <div class="col-md-6 text-right">
-        <p class="login">Login Link will go Here </p>  
+        <div class="login_logout">
+                {% if user %}
+                    <a href="{{url_for('gdisconnect')}}" class="btn btn-default">Logout</a>
+                {% else %}
+                    <a href="{{url_for('showLogin')}}" class="btn btn-default">Login</a>
+                {% endif %}
+        </div>
     </div>
 </div>
