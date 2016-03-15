@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Catalog - Much Items</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+        {% block scripts %}
+        {% endblock %}
+    </head>
+
+    <body>
+        <div class="container fill">
+            {% block content %}
+            {% endblock %}
+        </div>
+        {% block footer %}
+        {% endblock %}
+    </body>
+</html>
